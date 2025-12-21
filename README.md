@@ -6,3 +6,4 @@ The formalization is so simple but I did not see it before, and it seems that so
 
 See [here](https://konjacsource.github.io/assets/Russell_in_TT.pdf) for the note in pdf.
 
+Note that this construction is not [Coquand's paradox of tree](https://1lab.dev/1Lab.Counterexamples.Russell.html).

@@ -28,15 +28,14 @@ module FixPoint {A : Set} (g : A → A) where
   R : V 
   R = [ x ∣ ((x ∈ x) → A) ]
 
+  -- Erase type and identity, you'll find that this is exactly (\x -> g (x x)).
   R∉R : R ∈ R → A 
   R∉R R∈R = g (proj₂ R∈R (subst (λ x → x ∈ x) (sym (trasnp-eq R (proj₁ R∈R))) R∈R))
-
-  R∉R' : R ∈ R → A
-  R∉R' (h , p) = p (subst (λ x → x ∈ x) (sym (trasnp-eq R h)) (h , p)) 
 
   R∈R : R ∈ R
   R∈R = refl , R∉R
 
+  -- And this is (\x -> g (x x)) (\x -> g (x x)), which is Y combinator.
   fixpoint : A
   fixpoint = R∉R R∈R
 

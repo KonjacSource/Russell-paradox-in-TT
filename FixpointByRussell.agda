@@ -61,3 +61,10 @@ module FixPoint' {A : Set} (g : (⊤ → A) → ⊤ → A) where
   -- Now is OK!
   fixpoint-eq : fixpoint ≡ g fixpoint
   fixpoint-eq = refl 
+
+fact : ℕ → ℕ 
+fact = fixpoint (λ {f tt zero → 1; f tt (suc n) → (n + 1) * f tt n}) tt where 
+  open FixPoint'
+
+_ : fact 3 ≡ 6
+_ = refl

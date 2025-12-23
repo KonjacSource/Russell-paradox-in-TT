@@ -42,3 +42,22 @@ module FixPoint {A : Set} (g : A → A) where
   -- This will stuck the type checker
   -- fixpoint-eq : fixpoint ≡ g fixpoint
   -- fixpoint-eq = refl 
+
+-- To make it possible to check, we consider CBV Y combinator
+module FixPoint' {A : Set} (g : (⊤ → A) → ⊤ → A) where 
+
+  R : V 
+  R = [ x ∣ ((x ∈ x) → ⊤ → A) ]
+
+  R∉R : R ∈ R → ⊤ → A 
+  R∉R R∈R = g (λ {tt → proj₂ R∈R (subst (λ x → x ∈ x) (sym (trasnp-eq R (proj₁ R∈R))) R∈R) tt})
+
+  R∈R : R ∈ R
+  R∈R = refl , R∉R
+
+  fixpoint : ⊤ → A
+  fixpoint = R∉R R∈R
+
+  -- Now is OK!
+  fixpoint-eq : fixpoint ≡ g fixpoint
+  fixpoint-eq = refl 

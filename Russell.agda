@@ -26,7 +26,7 @@ R : V
 R = [ x ∣ ¬ x ∈ x ]
 
 R∉R : ¬ R ∈ R
-R∉R R∈R = proj₂ R∈R (subst (λ x → x ∈ x) (sym (trasnp-eq R (proj₁ R∈R))) R∈R) 
+R∉R R∈R = proj₂ R∈R (subst (λ x → x ∈ x) (sym (transp-eq R (proj₁ R∈R))) R∈R) 
 -- Or simply,
 -- R∉R (refl , p) = p (refl , p)
 -- Note this also requires k.

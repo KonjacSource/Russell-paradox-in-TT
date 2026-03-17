@@ -7,7 +7,20 @@ Unset Universe Checking.
 Definition set (A : Type) := A -> Type. 
 
 (* The V type can be seen as a type of all sets.  *)
-Definition V := { A : Type & set A }.
+Definition V := { A : Type & forall (x y : A) (p q : x = y), p = q & set A }.
+
+Definition Elem (A : Type) (a : A) (s : V) : Type := 
+  { eq : A = projT1 s & projT2 s (transp eq a) }.
+
+(* Theorem isSetV : forall (x : V) (eq : x = x), eq = eq_refl.
+Proof.
+  intros x H.
+  unfold V in x.
+  
+  
+Qed. *)
+
+
 Definition mkV (A : Type) (P : set A ) : V := existT _ A P.
 
 Module UseUIP.
@@ -77,6 +90,10 @@ Proof.
   dependent induction H2. (* this use JMeq *)
   auto.
 Qed.
+
+Print JMeq.
+
+Print nRinR.
 
 Theorem RinR : ElemV R R.
 Proof.

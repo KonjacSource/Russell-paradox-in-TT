@@ -71,7 +71,7 @@ Qed.
 End UseUIP.
 
 
-(* Use inductive type, no need UIP. *)
+(* Use inductive type. *)
 Module UseInductive.
   
 Inductive Elem {A : Type} : A -> V -> Type := 

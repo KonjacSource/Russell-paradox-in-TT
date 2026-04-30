@@ -2,7 +2,8 @@
 
 -- I hope this file can tell the difference between Russell's and Girard/Hurkens/Reynolds' paradox
 -- If the construction of a paradox can be fit into `NaiveSetTheory`, we can call it Russell's
--- If can be fit into `NonnaiveSetTheory` (or `RefinedNonnaive`), it should be Girard/Hurkens/Reynolds'.
+-- If can be fit into `NonnaiveSetTheory` (or `RefinedNonnaive` and we also require a judgemental equality), 
+-- it should be Girard/Hurkens/Reynolds'.
 
 open import Data.Product
 open import Function
@@ -125,7 +126,7 @@ Tmap-law : {A B C : Set} (f : A → B) (g : B → C) → Tmap (g ∘ f) ≡ Tmap
 Tmap-law f g = refl
 
 record NonnaiveSetTheory 
-    (V : Set) 
+    (V : Set)
     (intro : T V → V) 
     (match : V → T V) : Set where 
   -- match : (set : V) (element : V → Set) → Set
@@ -176,6 +177,60 @@ module DataType where
   Paradox = record 
           { prop  = λ u v z → z   
           ; prop' = λ u v z → z } 
+
+record StrongNaiveSetTheory 
+    (V : Set)
+    (intro : P V → V)
+    (match : V → P V) : Set where 
+
+  _∈_ : V → V → Set 
+  x ∈ y = match y x
+
+  field 
+    beta : (u : P V) → match (intro u) ≡ u 
+
+  prop  : (u : P V) (v : V) → v ∈ (intro u) → u v
+  prop u v = subst (λ z → z) (cong (λ x → x v) (beta u))
+  
+  prop' : (u : P V) (v : V) → u v → v ∈ (intro u)
+  prop' u v = subst (λ z → z) (sym (cong (λ x → x v) (beta u)))
+    
+  R : V 
+  R = intro λ x → ¬ x ∈ x  
+
+  R-prop : (x : V) → x ∈ R → ¬ x ∈ x 
+  R-prop = λ x p → prop (λ x → ¬ x ∈ x) x p
+
+  R∉R : ¬ R ∈ R 
+  R∉R R∈R = R-prop R R∈R R∈R 
+
+  R∈R : R ∈ R 
+  R∈R = prop' (λ x → ¬ (x ∈ x)) R R∉R
+
+  bot : ⊥ 
+  bot = R∉R R∈R
+
+-- A strong naive set theory forms a NonnaiveSetTheory
+module RussellForNonnaive V intro match (S : StrongNaiveSetTheory V intro match) where
+  open StrongNaiveSetTheory S
+  
+  -- in here, we [ p : P V ∣ p' p ] where p' : P (P V)
+  intro* : T V → V 
+  intro* pp = intro λ p → pp (match p)
+
+  match* : V → T V 
+  match* x p = match x (intro p)
+
+  -- We need match (intro v) = v to do this
+  prop* : (u : T V) (v : P V) → match* (intro* u) v → u v
+  prop* u v m = subst u (beta v) (prop _ _ m)
+
+  -- We need match (intro v) = v to do this
+  prop'* : (u : T V) (v : P V) → u v → match* (intro* u) v
+  prop'* u v m = prop' _ _ (subst u (sym (beta v)) m)
+
+  Paradox : NonnaiveSetTheory V intro* match*
+  Paradox = record { prop = prop* ; prop' = prop'* }
 
 -- Follow Coquand 1.2
 record RefinedNonnaive
@@ -232,8 +287,8 @@ module Reynolds where
   l₁ x h = h p₀ (s₁ x h)
 
   l₂ : p₀ x₀ 
-  l₂ p = l₀ (p ∘ δ)
-  
+  l₂ p = l₀ (p ∘ δ) 
+
 module Hurkens where  
 
   V : Set
